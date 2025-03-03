@@ -4,30 +4,17 @@ import sys
 import time
 import pygame 
 
+def main():
+    global tablero, screen, running
 
-tablero = [
-        ["-----", "-----", "-----", "-----", "__21__|", "__20_|", "__19_|", "-----", "-----", "-----", "-----"],
-        ["-----", "-----", "-----", "-----", "__22__|", "_____|", "__18_|", "-----", "-----", "-----", "-----"],
-        ["-----", "-----", "-----", "-----", "__23__|", "_____|", "__17_|", "-----", "-----", "-----", "-----"],
-        [" a1 |", " a2 |", "-----", "-----", "__24__|", "_____|", "__16_|", "-----", "-----", "-----", "-----"],
-        ["_29_|", "_28_|", "_27_|", "_26_|", "__25__|", "_____|", "__15_|", "_14_|", "_13_|", "_12_|", "_11__|"],
-        ["_30_|", "____|", "____|", "____|", "______|", "FINAL|", "_____|", "____|", "____|", "____|", "_10__|"],
-        ["_31_|", "_32_|", "_33_|", "_34_|", "__35__|", "_____|", "__5__|", "__6_|", "__7_|", "__8_|", "__9__|"],
-        ["-----", "-----", "-----", "-----", "__36__|", "_____|", "__4__|", " b1 |", " b2 |", "-----", "-----"],
-        ["-----", "-----", "-----", "-----", "__37__|", "_____|", "__3__|", "-----", "-----", "-----", "-----"],
-        ["-----", "-----", "-----", "-----", "__38__|", "_____|", "__2__|", "-----", "-----", "-----", "-----"],
-        ["-----", "-----", "-----", "-----", "__39__|", "_40__|", "__1__|", "-----", "-----", "-----", "-----"]
-    ]
-
-# Inicializar Pygame
 pygame.init()
 
-# Configuración de la ventana
-width, height = 1100, 500
+
+width, height = 1100, 550
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Parchís con Dados en Pygame")
 
-# Colores
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -35,10 +22,11 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-# Función para dibujar un dado
+
 def draw_dice(value, x, y):
     pygame.draw.rect(screen, BLACK, (x, y, 100, 100), 0)
     pygame.draw.rect(screen, WHITE, (x + 5, y + 5, 90, 90), 0)
+    
 
     if value == 1:
         pygame.draw.circle(screen, BLACK, (x + 50, y + 50), 10)
@@ -68,7 +56,7 @@ def draw_dice(value, x, y):
         pygame.draw.circle(screen, BLACK, (x + 70, y + 50), 10)
         pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
 
-# Función para dibujar el tablero de Parchís
+
 def draw_board():
     tablero = [
         ["-----", "-----", "-----", "-----", "__21__|", "__20_|", "__19_|", "-----", "-----", "-----", "-----"],
@@ -84,26 +72,27 @@ def draw_board():
         ["-----", "-----", "-----", "-----", "__39__|", "_40__|", "__1__|", "-----", "-----", "-----", "-----"]
     ]
 
-    # Dibujar el tablero
-    font = pygame.font.Font(None, 24)  # Fuente para el texto
+    font = pygame.font.Font(None, 24)  
     casilla_width = 60
     casilla_height = 30
 
     for row in range(len(tablero)):
         for col in range(len(tablero[row])):
-            text_surface = font.render(tablero[row][col], True, BLACK)  # Renderizar el texto
-            screen.blit(text_surface, (300 + col * casilla_width, 50 + row * casilla_height))  # Ajustar posición
+            pygame.draw.rect(screen, BLACK, (300 + col * casilla_width, 50 + row * casilla_height, casilla_width, casilla_height), 2)
+            text_surface = font.render(tablero[row][col], True, BLACK) 
+            screen.blit(text_surface, (300 + col * casilla_width, 50 + row * casilla_height))  
 
-# Bucle principal
+pygame.display.update()
+
 running = True
 dice1_value = random.randint(1, 6)
 dice2_value = random.randint(1, 6)
 
-# Dibujar los dados y el tablero inicialmente
+
 screen.fill(WHITE)
-draw_dice(dice1_value, 100, 150)  # Dado 1 en la posición (100, 150)
-draw_dice(dice2_value, 100, 270)  # Dado 2 en la posición (100, 270)
-draw_board()  # Dibujar el tablero de Parchís
+draw_dice(dice1_value, 100, 150)  
+draw_dice(dice2_value, 100, 270)  
+draw_board()  
 pygame.display.flip()
 
 while running:
@@ -112,16 +101,17 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:  # Al presionar la barra espaciadora
-                dice1_value = random.randint(1, 6)  # Generar un nuevo número aleatorio para el dado 1
-                dice2_value = random.randint(1, 6)  # Generar un nuevo número aleatorio para el dado 2
-                screen.fill(WHITE)  # Limpiar la pantalla
-                draw_dice(dice1_value, 100, 150)  # Dibujar el dado 1
-                draw_dice(dice2_value, 100, 270)  # Dibujar el dado 2
-                draw_board()  # Dibujar el tablero de Parchís
-                pygame.display.flip()  # Actualizar la pantalla
+                dice1_value = random.randint(1, 6)  
+                dice2_value = random.randint(1, 6)  
+                screen.fill(WHITE)  
+                draw_dice(dice1_value, 100, 150)  
+                draw_dice(dice2_value, 100, 270)  
+                draw_board()  
+                pygame.display.flip()
+            elif event.key == pygame.K_RETURN:
+                pass  
 
-# Salir
-pygame.quit()
+
 
 def limpiar():
     if os.name == "posix":
@@ -1068,4 +1058,9 @@ def Menú():
     else:
         Salir()
 
+pygame.quit()
+
 Menú()
+
+if __name__ == "__main__":
+    main()
