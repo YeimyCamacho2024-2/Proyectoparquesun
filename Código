@@ -1,0 +1,1071 @@
+import random
+import os
+import sys
+import time
+import pygame 
+
+
+tablero = [
+        ["-----", "-----", "-----", "-----", "__21__|", "__20_|", "__19_|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__22__|", "_____|", "__18_|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__23__|", "_____|", "__17_|", "-----", "-----", "-----", "-----"],
+        [" a1 |", " a2 |", "-----", "-----", "__24__|", "_____|", "__16_|", "-----", "-----", "-----", "-----"],
+        ["_29_|", "_28_|", "_27_|", "_26_|", "__25__|", "_____|", "__15_|", "_14_|", "_13_|", "_12_|", "_11__|"],
+        ["_30_|", "____|", "____|", "____|", "______|", "FINAL|", "_____|", "____|", "____|", "____|", "_10__|"],
+        ["_31_|", "_32_|", "_33_|", "_34_|", "__35__|", "_____|", "__5__|", "__6_|", "__7_|", "__8_|", "__9__|"],
+        ["-----", "-----", "-----", "-----", "__36__|", "_____|", "__4__|", " b1 |", " b2 |", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__37__|", "_____|", "__3__|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__38__|", "_____|", "__2__|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__39__|", "_40__|", "__1__|", "-----", "-----", "-----", "-----"]
+    ]
+
+# Inicializar Pygame
+pygame.init()
+
+# Configuración de la ventana
+width, height = 1100, 500
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Parchís con Dados en Pygame")
+
+# Colores
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+
+# Función para dibujar un dado
+def draw_dice(value, x, y):
+    pygame.draw.rect(screen, BLACK, (x, y, 100, 100), 0)
+    pygame.draw.rect(screen, WHITE, (x + 5, y + 5, 90, 90), 0)
+
+    if value == 1:
+        pygame.draw.circle(screen, BLACK, (x + 50, y + 50), 10)
+    elif value == 2:
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
+    elif value == 3:
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 50, y + 50), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
+    elif value == 4:
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 70), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
+    elif value == 5:
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 70), 10)
+        pygame.draw.circle(screen, BLACK, (x + 50, y + 50), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
+    elif value == 6:
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 50), 10)
+        pygame.draw.circle(screen, BLACK, (x + 30, y + 70), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 30), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 50), 10)
+        pygame.draw.circle(screen, BLACK, (x + 70, y + 70), 10)
+
+# Función para dibujar el tablero de Parchís
+def draw_board():
+    tablero = [
+        ["-----", "-----", "-----", "-----", "__21__|", "__20_|", "__19_|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__22__|", "_____|", "__18_|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__23__|", "_____|", "__17_|", "-----", "-----", "-----", "-----"],
+        [" a1 |", " a2 |", "-----", "-----", "__24__|", "_____|", "__16_|", "-----", "-----", "-----", "-----"],
+        ["_29_|", "_28_|", "_27_|", "_26_|", "__25__|", "_____|", "__15_|", "_14_|", "_13_|", "_12_|", "_11__|"],
+        ["_30_|", "____|", "____|", "____|", "______|", "FINAL|", "_____|", "____|", "____|", "____|", "_10__|"],
+        ["_31_|", "_32_|", "_33_|", "_34_|", "__35__|", "_____|", "__5__|", "__6_|", "__7_|", "__8_|", "__9__|"],
+        ["-----", "-----", "-----", "-----", "__36__|", "_____|", "__4__|", " b1 |", " b2 |", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__37__|", "_____|", "__3__|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__38__|", "_____|", "__2__|", "-----", "-----", "-----", "-----"],
+        ["-----", "-----", "-----", "-----", "__39__|", "_40__|", "__1__|", "-----", "-----", "-----", "-----"]
+    ]
+
+    # Dibujar el tablero
+    font = pygame.font.Font(None, 24)  # Fuente para el texto
+    casilla_width = 60
+    casilla_height = 30
+
+    for row in range(len(tablero)):
+        for col in range(len(tablero[row])):
+            text_surface = font.render(tablero[row][col], True, BLACK)  # Renderizar el texto
+            screen.blit(text_surface, (300 + col * casilla_width, 50 + row * casilla_height))  # Ajustar posición
+
+# Bucle principal
+running = True
+dice1_value = random.randint(1, 6)
+dice2_value = random.randint(1, 6)
+
+# Dibujar los dados y el tablero inicialmente
+screen.fill(WHITE)
+draw_dice(dice1_value, 100, 150)  # Dado 1 en la posición (100, 150)
+draw_dice(dice2_value, 100, 270)  # Dado 2 en la posición (100, 270)
+draw_board()  # Dibujar el tablero de Parchís
+pygame.display.flip()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:  # Al presionar la barra espaciadora
+                dice1_value = random.randint(1, 6)  # Generar un nuevo número aleatorio para el dado 1
+                dice2_value = random.randint(1, 6)  # Generar un nuevo número aleatorio para el dado 2
+                screen.fill(WHITE)  # Limpiar la pantalla
+                draw_dice(dice1_value, 100, 150)  # Dibujar el dado 1
+                draw_dice(dice2_value, 100, 270)  # Dibujar el dado 2
+                draw_board()  # Dibujar el tablero de Parchís
+                pygame.display.flip()  # Actualizar la pantalla
+
+# Salir
+pygame.quit()
+
+def limpiar():
+    if os.name == "posix":
+        os.system("clear")
+    elif os.name in ["ce", "nt", "dos"]:
+        os.system("cls")
+
+def lanzar_Dado():
+    return random.randint(1, 6)
+
+def mostrar_Dado(dado):
+    dado_visual = [
+        [
+            " ___ _____ ___ ",
+            "|   |     |   |",
+            "|   |  o  |   |",
+            "|___|_____|___|"
+        ],
+        [
+            " ___ _____ ___ ",
+            "| o |     |   |",
+            "|   |     |   |",
+            "|___|_____|_o_|"
+        ],
+        [
+            " ___ _____ ___ ",
+            "| o |     |   |",
+            "|   |  o  |   |",
+            "|___|_____|_o_|"
+        ],
+        [
+            " ___ _____ ___ ",
+            "| o |     | o |",
+            "|   |     |   |",
+            "|_o_|_____|_o_|"
+        ],
+        [
+            " ___ _____ ___ ",
+            "| o |     | o |",
+            "|   |  o  |   |",
+            "|_o_|_____|_o_|"
+        ],
+        [
+            " ___ _____ ___ ",
+            "| o |     | o |",
+            "| o |     | o |",
+            "|_o_|_____|_o_|"
+        ]
+    ]
+    
+    # Imprimir el dado visual
+    for line in dado_visual[dado - 1]:
+        print(line)
+
+
+dado = random.randint(1, 6)  # Simular el lanzamiento de un dado
+mostrar_Dado(dado)
+
+def Dado_A():
+    Dado2 = lanzar_Dado()
+    mostrar_Dado(Dado2)
+    print("Valor del Dado A:", Dado2)
+    input("Presiona Enter")
+    limpiar()
+    Salida_a(Dado2)
+
+def Dado_B():
+    Dado1 = lanzar_Dado()
+    mostrar_Dado(Dado1)
+    print("Valor del Dado B:", Dado1)
+    input("Presiona Enter")
+    limpiar()
+    Salida_b(Dado1)
+
+def Salida_b(x):
+    if x==5 and tablero[7][7]== " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]=="__7_|" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        print("true")
+        mostrar2()
+    elif x==5 and tablero[7][7]== " b1 |"   and tablero[10][6]=="__7_|" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        mostrar2()
+    elif x==5 and tablero[7][7]== " b1 |"   and tablero[10][6]==" b2 |" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]== " b1 |" and tablero[10][6]==" a1 |" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        Posición(10,6,7,7,1,1)
+    elif x==5 and tablero[7][7]== " b1 |" and tablero[10][6]==" a2 |" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        Posición(10,6,7,7,1,2)
+    elif x!=5 and tablero[7][7]== " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]!= " b1 |"and tablero[7][8]==" b2 |" and tablero[10][6]== "__7_|" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        tablero[10][6]=" b2 |"
+        tablero[7][8]="     "
+        mostrar2()
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]== " b1 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]== " a1 |" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Posición(10,6,7,8,2,1)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]== " a2 |" and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Posición(10,6,7,8,2,2)
+    elif x!=5 and tablero[7][7]!=" b1 |" and tablero[7][8]==" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Movimiento_b(x)
+    elif x!=5 and tablero[7][7]!= " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Movimiento_b(x)
+    elif x!=5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" a2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]=="__7_|" and tablero[10][10]=="1****":
+        tablero[10][6]=" b2 |"
+        tablero[7][8]="     "
+        mostrar2()
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]==" a1 |" and tablero[10][10]=="1****":
+        Posición(10,6,7,8,2,1)
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]==" a2 |" and tablero[10][10]=="1****":
+        Posición(10,6,7,8,2,2)
+    elif x!=5 and tablero[7][8]==" b2 |" and tablero[10][10]=="1****":
+        mostrar2()
+    elif x!=5 and tablero[7][8]!=" b2 |" and tablero[10][10]=="1****":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][8]!=" b2 |" and tablero[10][10]=="1****":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]=="__7_|" and tablero[10][9]=="2****":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        mostrar2()
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]==" a1 |" and tablero[10][9]=="2****":
+        Posición(10,6,7,7,1,1)
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]==" a2 |" and tablero[10][9]=="2****":
+        Posición(10,6,7,7,1,2)
+    elif x!=5 and tablero[7][7]==" b1 |"  and tablero[10][9]=="2****":
+        mostrar2()
+    elif x!=5 and tablero[7][7]!=" b1 |"  and tablero[10][9]=="2****":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!=" b1 |"  and tablero[10][9]=="2****":
+        ubicacion_ficha1B(x)
+    else:
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("No sale de carcel")
+
+def Salida_b(x):
+    if x==5 and tablero[7][7]== " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]=="____|" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        print("true")
+        mostrar2()
+    elif x==5 and tablero[7][7]== " b1 |"   and tablero[10][6]=="____|" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        mostrar2()
+    elif x==5 and tablero[7][7]== " b1 |"   and tablero[10][6]==" b2 |" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]== " b1 |" and tablero[10][6]==" a1 |" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        Posición(10,6,7,7,1,1)
+    elif x==5 and tablero[7][7]== " b1 |" and tablero[10][6]==" a2 |" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        Posición(10,6,7,7,1,2)
+    elif x!=5 and tablero[7][7]== " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]!= " b1 |"and tablero[7][8]==" b2 |" and tablero[10][6]== "____|" and  tablero[10][10]=="-----" and tablero[10][9]=="-----":
+        tablero[10][6]=" b2 |"
+        tablero[7][8]="     "
+        mostrar2()
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]== " b1 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]== " a1 |" and tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Posición(10,6,7,8,2,1)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" b2 |" and tablero[10][6]== " a2 |" and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Posición(10,6,7,8,2,2)
+    elif x!=5 and tablero[7][7]!=" b1 |" and tablero[7][8]==" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!= " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Movimiento_b(x)
+    elif x!=5 and tablero[7][7]!= " b1 |" and tablero[7][8]!=" b2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        Movimiento_b(x)
+    elif x!=5 and tablero[7][7]!= " b1 |" and tablero[7][8]==" a2 |"and  tablero[10][10]=="-----"and tablero[10][9]=="-----":
+        ubicacion_ficha1B(x)
+
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]=="____|" and tablero[10][10]=="1****":
+        tablero[10][6]=" b2 |"
+        tablero[7][8]="     "
+        mostrar2()
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]==" a1 |" and tablero[10][10]=="1****":
+        Posición(10,6,7,8,2,1)
+    elif x==5 and tablero[7][8]==" b2 |" and tablero[10][6]==" a2 |" and tablero[10][10]=="1****":
+        Posición(10,6,7,8,2,2)
+    elif x!=5 and tablero[7][8]==" b2 |" and tablero[10][10]=="1****":
+        mostrar2()
+    elif x!=5 and tablero[7][8]!=" b2 |" and tablero[10][10]=="1****":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][8]!=" b2 |" and tablero[10][10]=="1****":
+        ubicacion_ficha2B(x)
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]=="____|" and tablero[10][9]=="2****":
+        tablero[10][6]=" b1 |"
+        tablero[7][7]="     "
+        mostrar2()
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]==" a1 |" and tablero[10][9]=="2****":
+        Posición(10,6,7,7,1,1)
+    elif x==5 and tablero[7][7]==" b1 |" and tablero[10][6]==" a2 |" and tablero[10][9]=="2****":
+        Posición(10,6,7,7,1,2)
+    elif x!=5 and tablero[7][7]==" b1 |"  and tablero[10][9]=="2****":
+        mostrar2()
+    elif x!=5 and tablero[7][7]!=" b1 |"  and tablero[10][9]=="2****":
+        ubicacion_ficha1B(x)
+    elif x==5 and tablero[7][7]!=" b1 |"  and tablero[10][9]=="2****":
+        ubicacion_ficha1B(x)
+    else:
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("No sale de carcel")
+
+def Movimiento_b(x):
+    mostrar2()
+    print("Valor Dado", x)
+    print("Ficha a mover")
+    f1=False
+    while f1==False:
+        f=input("Ficha b1 press 1, press 2 ficha b2")
+        if f=="1":
+            f1=True
+            ubicacion_ficha1B(x)
+
+        elif f=="2":
+            ubicacion_ficha2B(x)
+            f1=True
+        else:
+            print("No existe")
+            f1=False
+            limpiar()
+            mostrar2()
+
+def ubicacion_ficha1B(x):
+    a=0
+    b=0
+    f=1
+    for i in range(11):
+        for j in range(11):
+           if tablero[i][j]==" b1 |":
+               print("ubicacion es",i,j)
+               a=i
+               b=j
+               break
+           else:
+               pass
+    print(a,b)
+    Mover_b(x,a,b,f)
+def ubicacion_ficha2B(x):
+    a=0
+    b=0
+    f=2
+    for i in range(11):
+        for j in range(11):
+           if tablero[i][j]==" b2 |":
+               print("ubicacion es",i,j)
+               a=i
+               b=j
+               break
+           else:
+               pass
+
+    Mover_b(x,a,b,f)
+##### global tablero
+def Mover_b(p,x,v,f):
+    print(p)
+    J1=[[0 , 0, 0, 0,21,20,19, 0, 0, 0, 0],
+       [0 , 0, 0, 0,22, 0,18, 0, 0, 0, 0],
+       [0 , 0, 0, 0,23, 0,17, 0, 0, 0, 0],
+       [0 , 0, 0, 0,24, 0,16, 0, 0, 0, 0],
+       [29,28,27,26,25, 0,15,14,13,12,11],
+       [30, 0, 0, 0, 0,45, 0, 0, 0, 0,10],
+       [31,32,33,34,35,44, 5, 6, 7, 8, 9],
+       [0 , 0, 0, 0,36,43, 4, 0, 0, 0, 0],
+       [0 , 0, 0, 0,37,42, 3, 0, 0, 0, 0],
+       [0 , 0, 0 ,0,38,41, 2, 0, 0, 0, 0],
+       [0 , 0 ,0, 0,39,40, 1, 0, 0, 0, 0]]
+    k=x
+    t=v
+
+    y=J1[x][v]
+    #pasos=p
+    print(y)
+    contador=0
+    u=0
+    while contador<p:
+        if y==J1[0][4] or y==J1[1][4] or y==J1[2][4] or y==J1[3][4]:
+            y=J1[x+1][v]
+            contador=contador+1
+            x=x+1
+
+        elif y==J1[4][4] or y==J1[4][3] or y==J1[4][2] or y==J1[4][1]:
+            y=J1[x][v-1]
+            contador=contador+1
+            v=v-1
+
+        elif y==J1[4][0] or y==J1[5][0] :
+            y=J1[x+1][v]
+            contador=contador+1
+            x=x+1
+
+        elif y==J1[6][0] or y==J1[6][1] or y==J1[6][2] or y==J1[6][3]:
+            y=J1[x][v+1]
+            contador=contador+1
+            v=v+1
+
+        elif y==J1[6][4] or y==J1[7][4] or y==J1[8][4] or y==J1[9][4]:
+            y=J1[x+1][v]
+            contador=contador+1
+            x=x+1
+
+        elif y==J1[10][4]  :
+            y=J1[x][v+1]
+            contador=contador+1
+            v=v+1
+
+        elif y==J1[10][6] or y==J1[9][6] or y==J1[8][6]or y==J1[7][6] :
+            y=J1[x-1][v]
+            contador=contador+1
+            x=x-1
+
+        elif y==J1[6][6] or y==J1[6][7] or y==J1[6][8] or y==J1[6][9]:
+            y=J1[x][v+1]
+            contador=contador+1
+            v=v+1
+
+        elif y==J1[6][10] or y==J1[5][10]  :
+            y=J1[x-1][v]
+            contador=contador+1
+            x=x-1
+
+        elif y==J1[4][10] or y==J1[4][9] or y==J1[4][8] or y==J1[4][7]:
+            y=J1[x][v-1]
+            contador=contador+1
+            v=v-1
+
+        elif y==J1[4][6] or y==J1[3][6] or y==J1[2][6]or y==J1[1][6] :
+            y=J1[x-1][v]
+            contador=contador+1
+            x=x-1
+
+        elif y==J1[0][6] or y==J1[0][5]:
+            y=J1[x][v-1]
+            contador=contador+1
+            v=v-1
+
+        elif y==J1[10][5] or y==J1[9][5] or y==J1[8][5] or y==J1[7][5]:
+            y=J1[x-1][v]
+            contador=contador+1
+            x=x-1
+
+        elif y==J1[6][5] and p==1 or p-contador==1:
+            print("Ficha terminada")
+            tablero[k][t]="____|"
+            u=1
+            contador=7
+
+            if f==1:
+                tablero[10][10]="1****"
+            else:
+                tablero[10][9]="2****"
+        elif y==J1[6][5] and p>1 or contador-p>1:
+            g=p-contador-2
+            y=J1[x+g][v]
+            contador=7
+            x=x+g
+        else:
+            print("Bloqueo")
+
+
+
+    print("Final_posicion", x,v)
+    if tablero[x][v]==" b2 |" and f==1:
+        print("Bloqueo")
+        Movimiento_b(p)
+    elif tablero[x][v]==" b1 |" and f==2:
+        print("Bloqueo")
+        Movimiento_b(p)
+    elif tablero[x][v]==" b1 |" and f==1:
+        tablero [x][v]=" b1 |"
+        mostrar2()
+    elif tablero [x][v]==" b2 |" and f==2:
+        tablero [x][v]=" b2 |"
+        mostrar2()
+
+    elif tablero[x][v]==" a1 |":
+        print("Carcel")
+
+        Posición(x,v,k,t,f,1)
+    elif tablero[x][v]==" a2 |":
+        print("Carcel")
+        Posición(x,v,k,t,f,2)
+    else:
+
+        Acpos2(x,v,k,t,f)
+
+
+def Posición(x,v,k,t,f,n):
+    if f==1 and n==1:
+        tablero[k][t]="____|"
+        tablero[x][v]=" b1 |"
+        tablero[3][0]=" a1 |"
+        mostrar2()
+        time.sleep(1)
+    elif f==2 and n==1:
+        tablero[k][t]="____|"
+        tablero[x][v]=" b2 |"
+        tablero[3][0]=" a1 |"
+        mostrar2()
+        time.sleep(1)
+    elif f==1 and n==2:
+        tablero[k][t]="____|"
+        tablero[x][v]=" b1 |"
+        tablero[3][1]=" a2 |"
+        mostrar2()
+        time.sleep(1)
+
+    elif f==2 and n==2:
+        tablero[k][t]="____|"
+        tablero[x][v]=" b2 |"
+        tablero[3][1]=" a2 |"
+        mostrar2()
+        time.sleep(1)
+
+    else:
+        print("Bloqueo")
+def mostrar2():
+    limpiar()
+    for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+
+def Acpos2(x,v,x0,v0,f):
+    limpiar()
+    if f==1:
+        tablero[x0][v0]="____|"
+        tablero[x][v]=" b1 |"
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("mueve b1")
+    else:
+        tablero[x0][v0]="____|"
+        tablero[x][v]=" b2 |"
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("mueve b2")
+
+####global tablero
+
+def Dado():
+   x=random.randint(1,6)
+   time.sleep(1)
+   if x==1:
+        Dado1=  [[" __","__","_"],
+                 ["| ", "  ", "  |"],
+                 ["| ", " o ", " |"],
+                 ["|_","__","__|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   elif x==2:
+        Dado1= [[" __","__","_"],
+                 ["|o", "  ", "  |"],
+                 ["| ", "   ", " |"],
+                 ["|_","__","_o|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   elif x==3:
+        Dado1= [[" __","__","_"],
+                 ["|o", "  ", "  |"],
+                 ["| ", " o ", " |"],
+                 ["|_","__","_o|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   elif x==4:
+        Dado1= [[" __","__","_"],
+                 ["|o", "  ", " o|"],
+                 ["| ", "   ", " |"],
+                 ["|o","__","_o|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   elif x==5:
+        Dado1= [[" __","__","_"],
+                 ["|o", "  ", " o|"],
+                 ["| ", " o ", " |"],
+                 ["|o","__","_o|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   else:
+        Dado1= [[" __","__","_"],
+                 ["|o", "  ", " o|"],
+                 ["|o", "   ", "o|"],
+                 ["|o","__","_o|"]]
+        for i in range (4):
+            for j in range (3):
+                print(Dado1[i][j], end="")
+            print()
+
+        print("Valor Dado", x)
+        input("Presiona Enter")
+   limpiar()
+   Salida_a(x)
+
+def Salida_a(x):
+
+    if x==5 and tablero[3][0]== " a1 |" and tablero[3][1]==" a2 |" and tablero[0][4]=="_28_|"and tablero[0][0]=="-----"  and tablero[0][1]=="-----":
+        tablero[0][4]=" a1 |"
+        tablero[3][0]="     "
+        print("true")
+        mostrar2()
+    elif x==5 and tablero[3][0]== " a1 |"   and tablero[0][4]=="_28_|" and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        tablero[0][4]=" a1 |"
+        tablero[3][0]="     "
+        mostrar2()
+    elif x==5 and tablero[3][0]== " a1 |"   and tablero[0][4]==" a2 |" and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        ubicacion_ficha2(x)
+
+    elif x==5 and tablero[3][0]== " a1 |"  and tablero[0][4]==" b1 |" and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        Enviar_carcel(0,4,3,0,1,1)
+    elif x==5 and tablero[3][0]== " a1 |"  and tablero[0][4]==" b2 |" and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        Enviar_carcel(0,4,3,0,1,2)
+    elif x!=5 and tablero[3][0]== " a1 |"and tablero[3][1]!=" a2 |" and tablero[0][0]=="-----"  and tablero[0][1]=="-----":
+        ubicacion_ficha2(x)
+    elif x==5 and tablero[3][0]!= " a1 |"and tablero[3][1]==" a2 |"and tablero[0][4]== "_28_|"and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        tablero[0][4]=" a2 |"
+        tablero[3][1]="     "
+        mostrar2()
+    elif x==5 and tablero[3][1]==" a2 |"and tablero[0][4]== " a1 |" and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        ubicacion_ficha1(x)
+
+    elif x==5 and tablero[3][0]!= " a1 |" and tablero[3][1]==" a2 |" and tablero[0][4]== " b1 |"  and tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        Enviar_carcel(0,4,3,1,2,1)
+    elif x==5 and tablero[3][0]!= " a1 |" and tablero[3][1]==" a2 |" and tablero[0][4]== " b2 |"  and  tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        Enviar_carcel(0,4,3,1,2,2)
+    elif x!=5 and tablero[3][0]!= " a1 |" and tablero[3][1]==" a2 |"and  tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        ubicacion_ficha1(x)
+    elif x==5 and tablero[3][0]!= " a1 |" and tablero[3][1]!=" a2 |"and  tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        seleccionar_ficha(x)
+    elif x!=5 and tablero[3][0]!= " a1 |" and tablero[3][1]!=" a2 |"and  tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        seleccionar_ficha(x)
+
+    elif x!=5 and tablero[3][0]!=" a1 |" and tablero[3][1]==" a2 |"and  tablero[0][0]=="-----"and tablero[0][1]=="-----":
+        ubicacion_ficha1(x)
+
+    elif x==5  and tablero[3][1]==" a2 |" and tablero[0][4]== "_28_|"  and  tablero[0][0]=="1****":
+        tablero[0][4]=" a2 |"
+        tablero[3][1]="     "
+        mostrar2()
+    elif x==5  and tablero[3][1]==" a2 |" and tablero[0][4]== " b1 |" and tablero[0][0]=="1****":
+        Enviar_carcel(0,4,3,1,2,1)
+    elif x==5  and tablero[3][1]==" a2 |" and tablero[0][4]== " b2 |" and tablero[0][0]=="1****":
+        Enviar_carcel(0,4,3,1,2,2)
+
+    elif x!=5  and tablero[3][1]==" a2 |"  and  tablero[0][0]=="1****":
+         mostrar2()
+    elif x!=5  and tablero[3][1]!=" a2 |"  and tablero[0][0]=="1****":
+        ubicacion_ficha2(x)
+    elif x==5  and tablero[3][1]!=" a2 |"  and  tablero[0][0]=="1****":
+        ubicacion_ficha2(x)
+
+    elif x==5  and tablero[3][0]==" a1 |" and tablero[0][4]== "_28_|"  and  tablero[0][1]=="2****":
+        tablero[0][4]=" a1 |"
+        tablero[3][0]="     "
+        mostrar2()
+    elif x==5  and tablero[3][0]==" a1 |" and tablero[0][4]== " b1 |"  and  tablero[0][1]=="2****":
+        Enviar_carcel(0,4,3,0,1,1)
+
+    elif x==5  and tablero[3][0]==" a1 |" and tablero[0][4]== " b2 |"  and  tablero[0][1]=="2****":
+        Enviar_carcel(0,4,3,0,1,2)
+    elif x!=5  and tablero[3][0]==" a1 |"  and  tablero[0][1]=="2****":
+        mostrar2()
+    elif x!=5  and tablero[3][0]!=" a1 |"  and  tablero[0][1]=="2****":
+        ubicacion_ficha1(x)
+    elif x==5  and tablero[3][0]!=" a1 |"  and  tablero[0][1]=="2****":
+        ubicacion_ficha1(x)
+    else:
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("No sale de carcel")
+
+
+###global tablero
+
+def seleccionar_ficha(x):
+    mostrar2()
+    print("Valor Dado", x)
+    print("Ficha a mover")
+    f1=False
+    while f1==False:
+        f=input("Mover ficha a1 press 1, press 2 ficha a2")
+        if f=="1":
+            f1=True
+            ubicacion_ficha1(x)
+
+        elif f=="2":
+            ubicacion_ficha2(x)
+            f1=True
+        else:
+            print("Invalido")
+            f1=False
+            limpiar()
+            mostrar2()
+
+def ubicacion_ficha1(x):
+    a=0
+    b=0
+    f=1
+    for i in range(11):
+        for j in range(11):
+           if tablero[i][j]==" a1 |":
+               print("ubicacion es",i,j)
+               a=i
+               b=j
+               break
+           else:
+               pass
+    print(a,b)
+    Mover_a(x,a,b,f)
+def ubicacion_ficha2(x):
+    a=0
+    b=0
+    f=2
+    for i in range(11):
+        for j in range(11):
+           if tablero[i][j]==" a2 |":
+               print("ubicacion es",i,j)
+               a=i
+               b=j
+               break
+           else:
+               pass
+
+    Mover_a(x,a,b,f)
+####global tablero
+def Mover_a(p,x,v,f):
+
+    J2=[[0 , 0, 0, 0, 1,40,39, 0, 0, 0, 0],
+                 [0 , 0, 0, 0, 2,41,38, 0, 0, 0, 0],
+                 [0 , 0, 0, 0, 3,42,37, 0, 0, 0, 0],
+                 [0 , 0, 0, 0, 4,43,36, 0, 0, 0, 0],
+                 [9 , 8, 7, 6, 5,44,35,34,33,32,31],
+                 [10, 0, 0, 0, 0,45, 0, 0, 0, 0,30],
+                 [11,12,13,14,15, 0,25,26,27,28,29],
+                 [0 , 0, 0, 0,16, 0,24, 0, 0, 0, 0],
+                 [0 , 0, 0, 0,17, 0,23, 0, 0, 0, 0],
+                 [0 , 0, 0 ,0,18, 0,22, 0, 0, 0, 0],
+                 [0 , 0 ,0, 0,19,20,21, 0, 0, 0, 0]]
+    k=x
+    t=v
+    u=0
+    y=J2[x][v]
+    #pasos=p
+
+    contador=0
+    while contador<p:
+        if y==J2[0][4] or y==J2[1][4] or y==J2[2][4] or y==J2[3][4]:
+            y=J2[x+1][v]
+
+            contador=contador+1
+            x=x+1
+
+        elif y==J2[4][4] or y==J2[4][3] or y==J2[4][2] or y==J2[4][1]:
+            y=J2[x][v-1]
+
+            contador=contador+1
+            v=v-1
+        elif y==J2[4][0] or y==J2[5][0] :
+            y=J2[x+1][v]
+
+            contador=contador+1
+            x=x+1
+        elif y==J2[6][0] or y==J2[6][1] or y==J2[6][2] or y==J2[6][3]:
+            y=J2[x][v+1]
+
+            contador=contador+1
+            v=v+1
+        elif y==J2[6][4] or y==J2[7][4] or y==J2[8][4] or y==J2[9][4]:
+            y=J2[x+1][v]
+
+            contador=contador+1
+            x=x+1
+        elif y==J2[10][4] or y==J2[10][5] :
+            y=J2[x][v+1]
+
+            contador=contador+1
+            v=v+1
+        elif y==J2[10][6] or y==J2[9][6] or y==J2[8][6]or y==J2[7][6] :
+            y=J2[x-1][v]
+
+            contador=contador+1
+            x=x-1
+        elif y==J2[6][6] or y==J2[6][7] or y==J2[6][8] or y==J2[6][9]:
+            y=J2[x][v+1]
+
+            contador=contador+1
+            v=v+1
+        elif y==J2[6][10] or y==J2[5][10]  :
+            y=J2[x-1][v]
+
+            contador=contador+1
+            x=x-1
+        elif y==J2[4][10] or y==J2[4][9] or y==J2[4][8] or y==J2[4][7]:
+            y=J2[x][v-1]
+
+            contador=contador+1
+            v=v-1
+        elif y==J2[4][6] or y==J2[3][6] or y==J2[2][6]or y==J2[1][6] :
+            y=J2[x-1][v]
+
+            contador=contador+1
+            x=x-1
+        elif y==J2[0][6]:
+            y=J2[x][v-1]
+
+            contador=contador+1
+            v=v-1
+        elif y==J2[0][5] or y==J2[1][5] or y==J2[2][5] or y==J2[3][5]:
+            y=J2[x+1][v]
+
+            contador=contador+1
+            x=x+1
+        elif y==J2[4][5] and p==1 or p-contador==1:
+            print("Ficha terminada")
+            tablero[k][t]="FINAL|"
+            u=1
+            contador=7
+            if f==1:
+                tablero[0][0]="1****"
+            else:
+                tablero[0][1]="2****"
+
+        elif y==J2[4][5] and p>1 or p-contador>1:
+            g=p-contador
+            y=J2[x-g][v]
+            contador=7
+            x=x-g+2
+        else:
+            contador=7
+
+
+    print("Final_posicion", x,v)
+    if tablero[x][v]==" a2 |" and f==1:
+        print("Bloqueo")
+        seleccionar_ficha(p)
+    elif tablero [x][v]==" a1 |"and f==2:
+        print("Bloqueo")
+        seleccionar_ficha(p)
+
+    elif tablero [x][v]==" a1 |" and f==1:
+        tablero [x][v]=" a1 |"
+
+    elif tablero [x][v]==" a2 |" and f==2:
+        tablero [x][v]=" a2 |"
+        mostrar2()
+    elif tablero[x][v]==" b1 |":
+        print("CARCEL")
+        Enviar_carcel(x,v,k,t,f,1)
+    elif u==1:
+        mostrar2()
+        time.sleep(1)
+
+    elif tablero[x][v]==" b2 |":
+        print("CARCEL")
+        Enviar_carcel(x,v,k,t,f,2)
+    else:
+
+        Acpos1(x,v,k,t,f)
+
+def Enviar_carcel(x,v,k,t,f,n):
+    if f==1 and n==1:
+        tablero[k][t]="____|"
+        tablero[x][v]=" a1 |"
+        tablero[7][7]=" b1 |"
+        mostrar2()
+        time.sleep(1)
+    elif f==2 and n==1:
+        tablero[k][t]="____|"
+        tablero[x][v]=" a2 |"
+        tablero[7][7]=" b1 |"
+        mostrar2()
+        time.sleep(1)
+    elif f==1 and n==2:
+        tablero[k][t]="____|"
+        tablero[x][v]=" a1 |"
+        tablero[7][8]=" b2 |"
+        mostrar2()
+        time.sleep(1)
+
+    elif f==2 and n==2:
+        tablero[k][t]="____|"
+        tablero[x][v]=" a2 |"
+        tablero[7][8]=" b2 |"
+        mostrar2()
+        time.sleep(1)
+
+    else:
+        print("Bloqueo")
+
+def Acpos1(x,v,x0,v0,f):
+    limpiar()
+    if f==1:
+        tablero[x0][v0]="____|"
+        tablero[x][v]=" a1 |"
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("a1 mueve")
+    else:
+        tablero[x0][v0]="____|"
+        tablero[x][v]=" a2 |"
+        for i in range (11):
+            for j in range (11):
+                print(tablero[i][j], end="")
+            print()
+        print("a2 mueve")
+
+
+def Inicio():
+    limpiar()
+    j1=input("Nick jugador 1: ")
+    print()
+    j2=input("Nick jugador 2: ")
+
+    for i in range (11):
+        for j in range (11):
+           print(tablero[i][j], end="")
+        print()
+    q=0
+    while q==0:
+
+        if tablero[0][0]=="1****" and tablero[0][1]=="2****":
+            print("Gano",j1, "Felicitaciones")
+            time.sleep(1)
+            input("Presiona Enter")
+            Salir()
+        elif tablero[10][10]=="1****" and tablero[10][9]=="2****":
+            print("Gano",j2, "Felicitaciones")
+            time.sleep(1)
+            input("Presiona Enter")
+            Salir()
+        else:
+            print("Juega ", j1)
+            input("Presione Enter")
+            Dado()
+            mostrar2()
+            print("Juega ", j2)
+            input("Presione Enter")
+            Dado_B()
+
+    print("gracias")
+
+
+def Empezar():
+    limpiar()
+    j1=input("nick jugador 1: ")
+    print()
+    j2=input("nick del jugador 2: ")
+    print()
+    for i in range (11):
+        for j in range (11):
+           print(tablero[i][j], end="")
+        print()
+    q=0
+    while q==0:
+
+        if tablero[0][0]=="1****" and tablero[0][1]=="2****":
+            print("Gano",j1)
+            time.sleep(1)
+            input("Presiona Enter")
+            Salir()
+        elif tablero[10][10]=="1****" and tablero[10][9]=="2****":
+            print("Gano",j2,)
+            time.sleep(1)
+            input("Presiona Enter")
+            Salir()
+        else:
+            print("Juega ", j1)
+            input("Presione Enter")
+            Dado()
+            mostrar2()
+            print("Juega ", j2)
+            input("Presione Enter")
+            Dado_B()
+
+def Jugadores():
+    limpiar()
+    print("Número de Jugadores")
+    print()
+    print("Ingrese 2 para dos Jugadores")
+    print()
+    print("Ingrese Exit")
+    a=input("Respuesta: ")
+    if a=="2":
+        Inicio()
+    elif a=="3":
+        Empezar()
+    else:
+        limpiar()
+        Menú()
+def Salir():
+    limpiar()
+    print("Gracias por jugar")
+    input("Enter Salir")
+    sys.exit()
+
+def Menú():
+    print("Ingrese 1 para jugar")
+    print()
+    a=input("Ingrese su respuesta: ")
+    if a=="1":
+        Jugadores()
+    else:
+        Salir()
+
+Menú()
