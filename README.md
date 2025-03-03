@@ -1,7 +1,7 @@
 # Proyectoparquesun
 Proyecto ParquesUN
 
-Integrantes: Daniela Cárdenas Quintero, Yeimy Juliana Camacho García.
+Integrantes: Yeimy Juliana Camacho García.
 
 - El juego comienza el menú que permite iniciar una partida, debera ingresar el número 1.
 - Se solicitara escribir el número 2 para dos jugadores.
